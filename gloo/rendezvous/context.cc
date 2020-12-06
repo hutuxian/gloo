@@ -9,6 +9,7 @@
 #include "gloo/rendezvous/context.h"
 
 #include "gloo/common/logging.h"
+#include "gloo/common/print_logging.h"
 #include "gloo/transport/address.h"
 
 namespace gloo {
@@ -34,6 +35,7 @@ std::vector<char> Context::extractAddress(
 void Context::connectFullMesh(
     rendezvous::Store& store,
     std::shared_ptr<transport::Device>& dev) {
+    GLOO_LOG(WARNING) << "begin connectFullMesh in gloo\n";
   std::vector<char> allBytes;
 
   // Create pairs
@@ -48,6 +50,7 @@ void Context::connectFullMesh(
     auto addrBytes = pair->address().bytes();
     allBytes.insert(allBytes.end(), addrBytes.begin(), addrBytes.end());
   }
+  GLOO_LOG(WARNING) << "create pair done\n";
 
   std::ostringstream storeKey;
   storeKey << rank;
@@ -63,6 +66,7 @@ void Context::connectFullMesh(
     std::ostringstream key;
     key << i;
     store.wait({key.str()}, getTimeout());
+    GLOO_LOG(WARNING) << "wait " << i << " pair done\n";
 
     // Connect to other side of this pair
     auto allAddrs = store.get(key.str());
@@ -75,6 +79,7 @@ void Context::connectFullMesh(
 
   device_ = dev;
   transportContext_ = std::move(transportContext);
+  GLOO_LOG(WARNING) << "ret from gloo\n";
 }
 
 ContextFactory::ContextFactory(std::shared_ptr<::gloo::Context> backingContext)
